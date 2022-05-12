@@ -90,13 +90,19 @@ describe('Lottery Contract', () => {
         });
 
         const initialBalance = await web3.eth.getBalance(accounts[0]);
+
         await lottery.methods.pickWinner().send({ from: accounts[0] });
+        const winner = await lottery.methods.lastWinner().call();
+
         const finalBalance = await web3.eth.getBalance(accounts[0]);
         const difference = finalBalance - initialBalance;
         console.log('difference: ', difference);
 
         // include gas cost, so difference is little less than 2 ether
         assert(difference > web3.utils.toWei('1.8', 'ether'));
+
+        // check if winner is correct
+        assert.equal(accounts[0], winner);
 
         // players array - test if it is empty
         const players = await lottery.methods.getPlayers().call({
